@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>novi - scan directories for the latest-version RPMs</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#flags">FLAGS</a></li>
+	<li><a href="#examples">EXAMPLES</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#website">WEBSITE</a></li>
+	<li><a href="#limitations">LIMITATIONS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#notes">NOTES</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>novi - scan directories for the latest-version RPMs</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p><strong>novi</strong> [ <strong>-a|action={type}</strong> ]
+   [ <strong>-t|--target={dir}</strong> ]
+   [ <strong>-v|--verbose</strong> ]
+   [ <strong>-h|--help</strong> ]
+   source1 [source2 source3 ...]</p>
+<p>Pass a list of RPM source directories as the last arguments.
+For example:</p>
+<pre>
+        novi -a hardlink -t /some/dir source1 source2 source3 ...</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>There may exist several versions of an RPM for a single product.  <strong>novi</strong>
+scans directories for RPMs and finds the latest-version RPM for every
+product.</p>
+<p>In turn, this data can be used to:</p>
+<dl>
+<dt><strong><a name="item__2d">-</a></strong><br />
+</dt>
+<dd>
+see what are the latest RPMs on your system
+</dd>
+<p></p>
+<dt><strong>-</strong><br />
+</dt>
+<dd>
+fold the latest RPMs into a Kickstart tree, such that you can
+build systems with the updates already applied
+</dd>
+<p></p></dl>
+<p>This process is part of Kickstart/Anaconda/Yum repository maintenance,
+described in the following article:</p>
+<p><strong>``Pre-Patched Kickstart Installs''</strong></p>
+<p><a href="http://www.linuxdevcenter.com/pub/a/linux/2005/02/17/kickstart_updates.html">http://www.linuxdevcenter.com/pub/a/linux/2005/02/17/kickstart_updates.html</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="flags">FLAGS</a></h1>
+<dl>
+<dt><strong><a name="item__2da_2c__2d_2daction_3d_7btype_7d"><strong>-a, --action={type}</strong></a></strong><br />
+</dt>
+<dd>
+Specify what to do with the results:
+</dd>
+<dd>
+<p><strong>list (default)</strong> - show a list of the latest-version RPMs found in the
+specified directories.</p>
+</dd>
+<dd>
+<p><strong>hardlink</strong> - hard-link the latest-version RPMs to the specfied directory.
+This saves space and requires less I/O than copying the files (since
+hard-linking involves an extra pointer in the inode table) but requires all
+source and target directories to exist on the same filesystem.</p>
+</dd>
+<dd>
+<p><strong>softlink</strong> (symbolic link) - this is similar to hard-linking, except that
+the source and destination directories may exist on different filesystems.
+If you serve your Yum/Kickstart area via webserver, make sure the webserver
+is configured to follow symbolic links.</p>
+</dd>
+<dd>
+<p><strong>copy</strong> - copies the latest-version RPMs to the target directory.  This is
+extremely I/O-intensive (an OS release may contain a couple gigabytes of
+RPMs) but makes the source and target directories completely independent of
+one another.</p>
+</dd>
+<dd>
+<p><strong>NOTE: ``copy'' functionality hasn't yet been implemented.</strong></p>
+</dd>
+<dd>
+<p>(All but ``list'' require a target directory, described below.)</p>
+</dd>
+<p></p>
+<dt><strong><a name="item__2dt_2c__2d_2dtarget_3d_7bdir_7d"><strong>-t, --target={dir}</strong></a></strong><br />
+</dt>
+<dd>
+Where to put the latest-version RPMs.
+(Used when the action is <strong>hardlink</strong> or <strong>softlink</strong>.)
+</dd>
+<p></p>
+<dt><strong><a name="item__2dv_2c__2d_2dverbose"><strong>-v, --verbose</strong></a></strong><br />
+</dt>
+<dd>
+enable verbose output
+</dd>
+<p></p>
+<dt><strong><a name="item__2dh_2c__2d_2dhelp"><strong>-h, --help</strong></a></strong><br />
+</dt>
+<dd>
+show a brief help message
+</dd>
+<p></p>
+<dt><strong><a name="item_source1__5bsource2_source3__2e_2e_2e_5d"><strong>source1 [source2 source3 ...]</strong></a></strong><br />
+</dt>
+<dd>
+Specify source paths for RPMs.  Sources can be plain directories (in which
+case novi will look for <strong>source/*.rpm</strong>) or paths to repo metadata files
+(novi will try to load <strong>source/repodata/primary.xml.gz</strong>).
+</dd>
+<dd>
+<p>Use the <strong>repo:</strong> prefix to specify a repo metadata source:</p>
+</dd>
+<dd>
+<pre>
+        novi ... repo:/some/path</pre>
+</dd>
+<dd>
+<p>Plain directories require no prefix:</p>
+</dd>
+<dd>
+<pre>
+        novi ... /some/path</pre>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="examples">EXAMPLES</a></h1>
+<p>Please refer to the separate <em>novi_examples(1)</em> man page for examples.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Ethan McCallum</p>
+<p>
+</p>
+<hr />
+<h1><a name="website">WEBSITE</a></h1>
+<p><strong><a href="http://www.ExMachinaTech.net/">http://www.ExMachinaTech.net/</a></strong>
+(still under construction)</p>
+<p>
+</p>
+<hr />
+<h1><a name="limitations">LIMITATIONS</a></h1>
+<p>novi calls the <strong>librpm</strong> library behind the scenes to extract RPM metadata
+and sort packages per RPM naming conventions.  A package that doesn't
+follow RPM naming conventions or a bug in librpm's version comparison may
+skew novi's results.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><em>novi_examples(1)</em></p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>None yet...</p>
+<p>
+</p>
+<hr />
+<h1><a name="notes">NOTES</a></h1>
+
+</body>
+
+</html>

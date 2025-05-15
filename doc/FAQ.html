@@ -1,0 +1,267 @@
+<DL>
+
+<DT>what's the purpose of this tool?</DT>
+
+<DD>
+<P>
+There may exist several versions of an RPM for a single product.  novi
+scans directories for RPMs and finds the latest-version RPM for every
+product.
+
+<P>
+In turn, this data can be used to:
+
+- see what are the latest RPMs on your system
+
+- fold the latest RPMs into a Kickstart tree, such that you can
+  build systems with the updates already applied
+
+<P>
+This process is described in much greater (and better) detail in the
+following article I wrote for the O'Reilly Network:
+
+<A HREF="http://www.linuxdevcenter.com/pub/a/linux/2005/02/17/kickstart_updates.html">"Pre-Patched Kickstart Installs"</A>
+<P>
+<CODE>http://www.linuxdevcenter.com/pub/a/linux/2005/02/17/kickstart_updates.html</CODE>
+</P>
+
+</DD>
+
+
+<!--  - - - - - - - - - - - - - - - - - - - - -->
+
+<DT>what's the origin of the name?</DT>
+
+<DD>
+<P>
+I wanted a name that would help communicate the tool's purpose: finding new things.
+</P>
+
+<P>
+Speakers of Russian may recognize this word:
+
+<DIV STYLE="padding-left: 40px;">
+		H O B bI
+		<BR/>
+		("NO-vee")
+</DIV>
+
+"novi" is the Russian word for "new."
+</P>
+
+<P>
+(Yes, given Latin approximations of Cyrillic characters, it should be
+"novy"; bear with me.)
+</P>
+</DD>
+
+<!--  - - - - - - - - - - - - - - - - - - -  -->
+
+<DT>why did you write this tool?</DT>
+
+<DD>
+<P>
+To ease my systems management pains.
+</P>
+
+<P>
+I once tried to hand-merge trees of updated RPMs and quickly realized my
+time would be better spent writing a tool to do the work.
+</P>
+</DD>
+
+<!--  - - - - - - - - - - - - - - - - - - - -->
+
+<DT>why did you share this tool?</DT>
+
+<DD>
+<P>
+To ease others' systems management pains.
+</P>
+</DD>
+
+<!--  - - - - - - - - - - - - - - - - - - - - -->
+
+<DT>Isn't that rather bold, releasing this as a 1.0 version?</DT>
+
+<DD>
+<P>
+Not really.  This code has been in incubation for over a year, and it's been
+running my yum repos just fine.  The brief preview release didn't uncover any
+problems, so I have confidence it will work in others' environments.
+</P>
+</DD>
+
+<!--  - - - - - - - - - - - - - - - - - - - - -->
+<DT>what's the license?</DT>
+
+<DD>
+<P>
+Apache 2.0, except for the STL wrappers around <CODE>glob()</CODE> -- I
+released that under a wide-open license when I published it in
+<A HREF="http://www.cuj.com">C/C++ Users Journal</A> (March 2005 issue).
+</P>
+
+<P>
+The license is at the top of every source file.
+</P>
+
+<P>
+The short version is: use novi in any product, commercial or not.  Just
+give credit where credit is due.
+</P>
+</DD>
+
+<!--  - - - - - - - - - - - - - - - - - - -  -->
+
+<DT>Speaking of credit where it's due, did you write novi all by yourself?</DT>
+
+<DD>
+<P>
+I wrote novi from scratch, but it relies on the RPM API (<CODE>librpm</CODE>) to extract
+header information and sort version numbers.
+</P>
+
+<P>
+novi also uses <CODE>libpopt</CODE> for commandline parsing.
+</P>
+</DD>
+
+<!--  - - - - - - - - - - - - - - - - - - -  -->
+
+<DT>How can novi use an Apache license?  Isn't RPM covered by the GPL?</DT>
+
+<DD>
+<P>
+The RPM tool is covered by GPL, yes; but the RPM developer's toolkit is
+LGPL.  (Refer to the RPM source bundle for details.)
+</P>
+
+<P>
+Therefore, products linked against <CODE>librpm</CODE> aren't covered by the GPL.
+</P>
+</DD>
+
+<!--  - - - - - - - - - - - - - - - - - - -  -->
+
+<DT>Do you have any examples?</DT>
+
+<DD>
+<P>
+Yes. Please see the file "EXAMPLES.TXT" in the source distribution.
+</P>
+
+<P>
+Those examples will soon be folded into a proper man page.
+</P>
+</DD>
+
+<!--  - - - - - - - - - - - - - - - - - - - - -->
+<DT>The examples show novi being run as a nonroot user.  Why is this?</DT>
+
+<DD>
+<P>
+novi certainly <EM>can</EM> run as root, but why?  The tool was designed such
+that it could be easily folded into scripts and cron jobs (e.g. right after
+you've downloaded RPM updates); in turn, it's often safer to let automated
+processes run as nonroot users.  This limits the scope of damage in the event
+said process goes awry.
+</P>
+
+</DD>
+
+<!--  - - - - - - - - - - - - - - - - - - - - -->
+
+<DT>From where does novi load RPM data?</DT>
+
+<DD>
+<P>
+As of version 1.1.0, novi loads RPM data from two source
+types: directories and repo data files.
+</P>
+
+<P>
+For directories, just specify some path as the source:
+
+<PRE>
+novi ... /some/path
+</PRE>
+
+novi will look for files named <CODE>/some/path/*.rpm</CODE>.
+</P>
+
+<P>
+Specify the <CODE>repo:</CODE> prefix to load from a repo data
+file:
+
+<PRE>
+novi ... repo:/some/path
+</PRE>
+
+novi will try to read RPM header data from
+<CODE>/some/path/repodata/primary.xml.gz</CODE>
+</P>
+
+<P>
+All of this is explained in greater detail in the examples.
+</P>
+
+</DD>
+
+<!--  - - - - - - - - - - - - - - - - - - - - -->
+
+<DT>Why did you add the repo metadata functionality?</DT>
+
+<DD>
+
+<P>
+When novi loads data from a directory, it must open every
+RPM therein to extract header data such as the package
+name and version.  Some collections of RPMs never change
+(think of the base OS install) so novi wastes a lot of 
+cycles churning through that static data.
+</P>
+
+<P>
+I had considered creating a data store that novi could
+use between runs -- essentially, a cache of those directories
+that don't change -- but I realized the
+
+<A HREF="http://linux.duke.edu/projects/metadata/">
+Repository Metadata Project
+</A>
+had already done it.  This project defines a file format to store RPM
+header info, including that which novi uses.  You can run the
+<CODE>createrepo</CODE> tool <EM>once</EM> on such a static repository, and
+novi can load the data from the resultant metadata file.
+</P>
+
+<P>
+In short, novi users an experience significant performance
+gains by loading data from a repodata file.  You can let
+<CODE>createrepo</CODE> do the work and let novi reap the
+benefits.
+</P>
+
+</DD>
+
+
+<!--  - - - - - - - - - - - - - - - - - - - - -->
+
+<DT>I have more questions! Whom can I ask?</DT>
+
+<DD>
+<P>
+For now, please send messages to
+
+<PRE>
+novi-questions -at- ExMachinaTech -dot- net
+</PRE>
+
+There will soon be a mailing list.
+</P>
+</DD>
+
+<!--  - - - - - - - - - - - - - - - - - - - - -->
+
+</DL>

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+##
+## generate docs for novi
+##
+
+## QQQ: fold into an (optional) make target
+
+pod2man /scratch/dev/novi/doc/novi_examples.1.pod  > novi_examples.1
+pod2man /scratch/dev/novi/doc/novi.1.pod  > novi.1
+
+pod2html novi_examples.1.pod > novi_examples.1.html
+pod2html novi.1.pod > novi.1.html
+
+pod2text novi_examples.1.pod > ../EXAMPLES.TXT
+
+rm -f pod2htm*.tmp
+
+lynx -nolist -dump FAQ.html  | sed -e 's:^   ::' -e 's:^     ::' > ../FAQ.TXT

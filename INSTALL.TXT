@@ -1,0 +1,15 @@
+For this preview phase, novi's build process is still fairly raw.
+
+Know the old "configure; make; make install" routine?  We have the first
+two.  "make install" is due soon.
+
+For the time being, you can copy the (lone) binary to your preferred
+directory:
+
+	build/bin/novi
+
+
+I expect future releases to have a proper install routine.  RPMs are also
+in the works.
+
+

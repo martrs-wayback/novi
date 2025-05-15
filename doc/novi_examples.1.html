@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>NAME</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#examples">EXAMPLES</a></li>
+	<ul>
+
+		<li><a href="#example__show_the_latest_rpms_in_a_single_source_directory">Example: show the latest RPMs in a single source directory</a></li>
+		<li><a href="#example__show_the_latest_rpms_in_a_set_of_source_directories">Example: show the latest RPMs in a set of source directories</a></li>
+		<li><a href="#example__hardlink_the_latest_rpms_to_another_directory">Example: hardlink the latest RPMs to another directory</a></li>
+		<li><a href="#example__copy_the_latest_rpms_to_another_directory">Example: copy the latest RPMs to another directory</a></li>
+		<li><a href="#example__load_rpms_from_a_repo_metadata_file">Example: load RPMs from a repo metadata file</a></li>
+	</ul>
+
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#website">WEBSITE</a></li>
+	<li><a href="#limitations">LIMITATIONS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p><strong>novi</strong> sample usage</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Sample scenarios for using novi</p>
+<p>
+</p>
+<hr />
+<h1><a name="examples">EXAMPLES</a></h1>
+<p>
+</p>
+<h2><a name="example__show_the_latest_rpms_in_a_single_source_directory">Example: show the latest RPMs in a single source directory</a></h2>
+<p>You have a directory with the all of the RPMs for a given release.  (That
+is, orignal RPMs plus the updates.)  You want to see what's the latest
+version of each product therein.</p>
+<pre>
+   $ novi -a list /some/dir/RPMS</pre>
+<p>The output isn't much to look at.  That will change in the future.  The
+``list'' option started off as a debugging tool.</p>
+<p>Since ``list'' is the default action, you could shorten this commandline to:</p>
+<pre>
+   $ novi /some/dir/RPMS</pre>
+<p>The program already looks for files of the pattern ``*.rpm'' so you don't
+have to specify this on the commandline.</p>
+<p>Note that the search for RPM files is NOT recursive; the files must exist
+just beneath the specified source directory.</p>
+<p>
+</p>
+<h2><a name="example__show_the_latest_rpms_in_a_set_of_source_directories">Example: show the latest RPMs in a set of source directories</a></h2>
+<p>Your RPMs are separated into different directories -- OS, updates,
+third-party, and so on.  You want to see the latest version of each
+product.</p>
+<pre>
+   $ novi /dir1/RPMS /dir2/RPMS /dir3/RPMS [...] /dirN/RPMS</pre>
+<p>There's no hard limit on the number of RPMs novi can handle.  The only
+limit should be your system's available memory for the objects, and any
+upper limits on your C++ implementation's STL containers.</p>
+<p>
+</p>
+<h2><a name="example__hardlink_the_latest_rpms_to_another_directory">Example: hardlink the latest RPMs to another directory</a></h2>
+<p>You want to find the latest-version RPMs in a series of directories, and
+hard-link them to another location (e.g. the base of a new Kickstart tree).</p>
+<pre>
+   $ novi -a hardlink -t /target/dir /dir1/RPMS [...] /dirN/RPMS</pre>
+<p>As a reminder, the hard-link only works if <strong>all</strong> of these directories are
+on the same filesystem.</p>
+<p>
+</p>
+<h2><a name="example__copy_the_latest_rpms_to_another_directory">Example: copy the latest RPMs to another directory</a></h2>
+<p>This feature isn't yet implemented.  Expect it in an upcoming release, if
+enough people really ask for it.</p>
+<p>Given the significant I/O activity, though, would you really want to copy
+the RPMs to the target directory?  (A single Fedora release can have a
+couple of gigabytes in RPMs.)  By comparison, a hard-link isn't quite so
+I/O-intensive: it just requires another file pointer in the inode table,
+which doesn't require reading/writing the file itself.</p>
+<p>
+</p>
+<h2><a name="example__load_rpms_from_a_repo_metadata_file">Example: load RPMs from a repo metadata file</a></h2>
+<p>Some repos -- such as the base OS install media -- never change.  You can
+run <strong>createrepo</strong> on those directories to generate repository metadata.
+In turn, novi can load RPM header info out of the repo metadata files instead
+of parsing each RPM individually.  This results in significant performance
+gains because of the reduced I/O.</p>
+<pre>
+        $ novi -a list repo:/some/dir /some/other/dir</pre>
+<p>In the above example, novi will load RPM header info from the file</p>
+<pre>
+        /some/dir/repodata/primary.xml.gz</pre>
+<p>(It will also read RPMs from /some/other/dir.  This demonstrates that you
+can mix and match directory and repo sources.)</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Ethan McCallum</p>
+<p>
+</p>
+<hr />
+<h1><a name="website">WEBSITE</a></h1>
+<p><strong><a href="http://www.ExMachinaTech.net/">http://www.ExMachinaTech.net/</a></strong></p>
+<p>
+</p>
+<hr />
+<h1><a name="limitations">LIMITATIONS</a></h1>
+<p>refer to the <em>novi(1)</em> manpage</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><em>novi(1)</em></p>
+<p>The <strong>Repository Metadata Project</strong> at 
+<a href="http://linux.duke.edu/projects/metadata/">http://linux.duke.edu/projects/metadata/</a>
+explains the repo metadata format.</p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>refer to the <em>novi(1)</em> manpage, and/or the novi website at
+<strong><a href="http://www.ExMachinaTech.net/">http://www.ExMachinaTech.net/</a></strong></p>
+
+</body>
+
+</html>

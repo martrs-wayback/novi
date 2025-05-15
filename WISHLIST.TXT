@@ -1,0 +1,13 @@
+novi wishlist
+
+- enable/disable, on a per-product basis, use of RPM epoch in sorting
+
+- consider folding all of a given product's source RPMs into a single
+  bucket.  Right now, two SRPMS for the same product can be put into
+  different buckets, if they are of different architectures.  
+  (Question: is it an invariant that all SRPMs are architecture-neutral?
+   e.g. they are sometimes labeled w/ a given arch out of error, not
+   intent?)
+
+- make it faster (in the works)
+

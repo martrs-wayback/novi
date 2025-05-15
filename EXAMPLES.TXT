@@ -1,0 +1,95 @@
+NAME
+    novi sample usage
+
+DESCRIPTION
+    Sample scenarios for using novi
+
+EXAMPLES
+  Example: show the latest RPMs in a single source directory
+    You have a directory with the all of the RPMs for a given release. (That
+    is, orignal RPMs plus the updates.) You want to see what's the latest
+    version of each product therein.
+
+       $ novi -a list /some/dir/RPMS
+
+    The output isn't much to look at. That will change in the future. The
+    "list" option started off as a debugging tool.
+
+    Since "list" is the default action, you could shorten this commandline
+    to:
+
+       $ novi /some/dir/RPMS
+
+    The program already looks for files of the pattern "*.rpm" so you don't
+    have to specify this on the commandline.
+
+    Note that the search for RPM files is NOT recursive; the files must
+    exist just beneath the specified source directory.
+
+  Example: show the latest RPMs in a set of source directories
+    Your RPMs are separated into different directories -- OS, updates,
+    third-party, and so on. You want to see the latest version of each
+    product.
+
+       $ novi /dir1/RPMS /dir2/RPMS /dir3/RPMS [...] /dirN/RPMS
+
+    There's no hard limit on the number of RPMs novi can handle. The only
+    limit should be your system's available memory for the objects, and any
+    upper limits on your C++ implementation's STL containers.
+
+  Example: hardlink the latest RPMs to another directory
+    You want to find the latest-version RPMs in a series of directories, and
+    hard-link them to another location (e.g. the base of a new Kickstart
+    tree).
+
+       $ novi -a hardlink -t /target/dir /dir1/RPMS [...] /dirN/RPMS
+
+    As a reminder, the hard-link only works if all of these directories are
+    on the same filesystem.
+
+  Example: copy the latest RPMs to another directory
+    This feature isn't yet implemented. Expect it in an upcoming release, if
+    enough people really ask for it.
+
+    Given the significant I/O activity, though, would you really want to
+    copy the RPMs to the target directory? (A single Fedora release can have
+    a couple of gigabytes in RPMs.) By comparison, a hard-link isn't quite
+    so I/O-intensive: it just requires another file pointer in the inode
+    table, which doesn't require reading/writing the file itself.
+
+  Example: load RPMs from a repo metadata file
+    Some repos -- such as the base OS install media -- never change. You can
+    run createrepo on those directories to generate repository metadata. In
+    turn, novi can load RPM header info out of the repo metadata files
+    instead of parsing each RPM individually. This results in significant
+    performance gains because of the reduced I/O.
+
+            $ novi -a list repo:/some/dir /some/other/dir
+
+    In the above example, novi will load RPM header info from the file
+
+            /some/dir/repodata/primary.xml.gz
+
+    (It will also read RPMs from /some/other/dir. This demonstrates that you
+    can mix and match directory and repo sources.)
+
+AUTHOR
+    Ethan McCallum
+
+WEBSITE
+    http://www.ExMachinaTech.net/
+
+LIMITATIONS
+    refer to the novi(1) manpage
+
+SEE ALSO
+    novi(1)
+
+    The Repository Metadata Project at
+    http://linux.duke.edu/projects/metadata/ explains the repo metadata
+    format.
+
+BUGS
+    refer to the novi(1) manpage, and/or the novi website at
+    http://www.ExMachinaTech.net/
+

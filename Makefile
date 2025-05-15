@@ -1,0 +1,239 @@
+##
+## toplevel makefile for Novi
+##
+
+## - - - - - - - - - - - - - - - - - - - -
+
+srcdir = .
+top_srcdir = .
+builddir = .
+top_builddir = .
+
+SRC_BASE =  .
+SRC_BASE_ABSOLUTE =  /home/edward/rpmbuild/BUILD/novi-2.1.2
+VERSION_FULL = 2.1.2
+
+BUILD_BASE =  ./build
+
+SRC_DIR = ${top_srcdir}/src
+INCLUDE_DIR_BASE = ${top_srcdir}/include
+INCLUDE_DIR_GENERATED = ${top_srcdir}/include.generated
+
+BUILD_BIN_DIR = ${BUILD_BASE}/bin
+BUILD_OBJ_DIR = ${BUILD_BASE}/obj
+BUILD_MAN_DIR = ${BUILD_BASE}/man
+BUILD_MAN1_DIR = ${BUILD_BASE}/man/man1
+
+PREFIX=/usr
+INSTALL_BASE =  ${ALT_ROOT_DIR}${PREFIX}
+
+INSTALL_BIN_DIR = ${INSTALL_BASE}/bin
+INSTALL_DOC_DIR = ${INSTALL_BASE}/share/doc/novi-${VERSION_FULL}
+INSTALL_MAN_DIR = ${INSTALL_BASE}/share/man
+INSTALL_MAN1_DIR = ${INSTALL_MAN_DIR}/man1
+
+##
+## we don't explicitly set owner/group here.  If the installation
+## is done by hand, we let the natural order of things decide. If
+## installation is done by RPM, the spec file will set owner/group
+## for us -qm
+##
+INSTALL_COMMAND = ${SRC_BASE}/install-sh
+INSTALL_COMMAND_DIRECTORY   = ${INSTALL_COMMAND} -m 755 -d
+INSTALL_COMMAND_EXECUTABLE  = ${INSTALL_COMMAND} -m 555
+INSTALL_COMMAND_DATAFILE    = ${INSTALL_COMMAND} -m 444
+
+LIBTOOL_COMPILE = $(SHELL) $(top_builddir)/libtool --mode=compile
+LIBTOOL_LINK =    $(SHELL) $(top_builddir)/libtool --mode=link
+LIBTOOL_INSTALL = $(SHELL) $(top_builddir)/libtool --mode=install
+
+## - - - - - - - - - - - - - - - - - - - -
+
+CXXFLAGS_LOCAL = -I${INCLUDE_DIR_BASE} -I${INCLUDE_DIR_GENERATED}
+CXXFLAGS_PROFILE = ## -pg
+CXXFLAGS_DEBUG = ## -g
+CXXFLAGS = ${CXXFLAGS_LOCAL} ${CXXFLAGS_PROFILE} ${CXXFLAGS_DEBUG}
+
+LDFLAGS_PROFILE = ## -pg
+LDFLAGS_DEBUG = ## -g
+LDFLAGS_POPT = -lpopt
+LDFLAGS_RPM = -lrpm -lrpmio
+LDFLAGS_EXPAT = -lexpat
+LDFLAGS_POPT = -lpopt
+LDFLAGS_GZIP = -lz
+
+LDFLAGS = ${LDFLAGS_PROFILE} \
+	${LDFLAGS_DEBUG} \
+	${LDFLAGS_POPT} \
+	${LDFLAGS_RPM} \
+	${LDFLAGS_EXPAT} \
+	${LDFLAGS_POPT} \
+	${LDFLAGS_GZIP}
+
+OBJECT_FILES = \
+	${BUILD_OBJ_DIR}/NoviInfo.lo \
+	${BUILD_OBJ_DIR}/GlobObj.lo \
+	${BUILD_OBJ_DIR}/AppException.lo \
+	${BUILD_OBJ_DIR}/AppConfig.lo \
+	\
+	${BUILD_OBJ_DIR}/RPM.lo \
+	${BUILD_OBJ_DIR}/Product.lo \
+	${BUILD_OBJ_DIR}/Action.lo \
+	${BUILD_OBJ_DIR}/ListAction.lo \
+	${BUILD_OBJ_DIR}/PrintAction.lo \
+	${BUILD_OBJ_DIR}/HardlinkAction.lo \
+	${BUILD_OBJ_DIR}/SoftlinkAction.lo \
+	${BUILD_OBJ_DIR}/ProductList.lo \
+	${BUILD_OBJ_DIR}/RPMSourceDescription.lo \
+	${BUILD_OBJ_DIR}/DirectoryRPMSource.lo \
+	${BUILD_OBJ_DIR}/RPMFileReader.lo \
+	\
+	${BUILD_OBJ_DIR}/TagStack.lo \
+	${BUILD_OBJ_DIR}/AttributeMap.lo \
+	${BUILD_OBJ_DIR}/GzipInputStream.lo \
+	${BUILD_OBJ_DIR}/RPMInfoHandler.lo \
+	${BUILD_OBJ_DIR}/RepoMDParser.lo \
+	${BUILD_OBJ_DIR}/RepodataRPMSource.lo \
+	${BUILD_OBJ_DIR}/main.lo
+
+BINARIES = ${BUILD_BIN_DIR}/novi
+
+CXX = g++
+
+## - - - - - - - - - - - - - - - - - - - -
+
+all: dirs ${BINARIES}
+
+dirs:
+	@echo "-= creating build directory structure =-"
+	@for dir in \
+		${BUILD_BASE} \
+		${BUILD_BIN_DIR} \
+		${BUILD_OBJ_DIR} \
+		${BUILD_MAN_DIR} \
+		${BUILD_MAN1_DIR} \
+	; do \
+		if [ ! -d $${dir} ] ; then \
+			mkdir $${dir} ; \
+		fi ; \
+	done
+	@echo
+
+
+${BUILD_BIN_DIR}/novi: ${OBJECT_FILES}
+	${LIBTOOL_LINK} ${CXX} ${LDFLAGS} -o ${@} ${OBJECT_FILES}
+
+${BUILD_OBJ_DIR}/NoviInfo.lo: ${SRC_DIR}/NoviInfo.cc ${INCLUDE_DIR_GENERATED}/NoviInfo.h
+	${LIBTOOL_COMPILE} ${CXX} -c ${CXXFLAGS} -o ${BUILD_OBJ_DIR}/NoviInfo.lo ${SRC_DIR}/NoviInfo.cc
+
+${BUILD_OBJ_DIR}/GlobObj.lo: ${SRC_DIR}/GlobObj.cc ${INCLUDE_DIR_BASE}/GlobObj.h
+	${LIBTOOL_COMPILE} ${CXX} -c ${CXXFLAGS} -o ${BUILD_OBJ_DIR}/GlobObj.lo ${SRC_DIR}/GlobObj.cc
+
+${BUILD_OBJ_DIR}/AppException.lo: ${SRC_DIR}/AppException.cc ${INCLUDE_DIR_BASE}/AppException.h
+	${LIBTOOL_COMPILE} ${CXX} -c ${CXXFLAGS} -o ${BUILD_OBJ_DIR}/AppException.lo ${SRC_DIR}/AppException.cc
+
+${BUILD_OBJ_DIR}/AppConfig.lo: ${SRC_DIR}/AppConfig.cc ${INCLUDE_DIR_BASE}/AppConfig.h
+	${LIBTOOL_COMPILE} ${CXX} -c ${CXXFLAGS} -o ${BUILD_OBJ_DIR}/AppConfig.lo ${SRC_DIR}/AppConfig.cc
+
+
+${BUILD_OBJ_DIR}/Action.lo: ${SRC_DIR}/Action.cc
+	${LIBTOOL_COMPILE} ${CXX} -c ${CXXFLAGS} -o ${BUILD_OBJ_DIR}/Action.lo ${SRC_DIR}/Action.cc
+
+
+${BUILD_OBJ_DIR}/CommonUtil.lo: ${SRC_DIR}/CommonUtil.cc
+	${LIBTOOL_COMPILE} ${CXX} -c ${CXXFLAGS} -o ${BUILD_OBJ_DIR}/CommonUtil.lo ${SRC_DIR}/CommonUtil.cc
+
+
+${BUILD_OBJ_DIR}/DirectoryRPMSource.lo: ${SRC_DIR}/DirectoryRPMSource.cc
+	${LIBTOOL_COMPILE} ${CXX} -c ${CXXFLAGS} -o ${BUILD_OBJ_DIR}/DirectoryRPMSource.lo ${SRC_DIR}/DirectoryRPMSource.cc
+
+
+${BUILD_OBJ_DIR}/RPMFileReader.lo: ${SRC_DIR}/RPMFileReader.cc
+	${LIBTOOL_COMPILE} ${CXX} -c ${CXXFLAGS} -o ${BUILD_OBJ_DIR}/RPMFileReader.lo ${SRC_DIR}/RPMFileReader.cc
+
+
+${BUILD_OBJ_DIR}/HardlinkAction.lo: ${SRC_DIR}/HardlinkAction.cc
+	${LIBTOOL_COMPILE} ${CXX} -c ${CXXFLAGS} -o ${BUILD_OBJ_DIR}/HardlinkAction.lo ${SRC_DIR}/HardlinkAction.cc
+
+
+${BUILD_OBJ_DIR}/ListAction.lo: ${SRC_DIR}/ListAction.cc
+	${LIBTOOL_COMPILE} ${CXX} -c ${CXXFLAGS} -o ${BUILD_OBJ_DIR}/ListAction.lo ${SRC_DIR}/ListAction.cc
+
+
+${BUILD_OBJ_DIR}/PrintAction.lo: ${SRC_DIR}/PrintAction.cc
+	${LIBTOOL_COMPILE} ${CXX} -c ${CXXFLAGS} -o ${BUILD_OBJ_DIR}/PrintAction.lo ${SRC_DIR}/PrintAction.cc
+
+
+${BUILD_OBJ_DIR}/ProductList.lo: ${SRC_DIR}/ProductList.cc
+	${LIBTOOL_COMPILE} ${CXX} -c ${CXXFLAGS} -o ${BUILD_OBJ_DIR}/ProductList.lo ${SRC_DIR}/ProductList.cc
+
+
+${BUILD_OBJ_DIR}/Product.lo: ${SRC_DIR}/Product.cc
+	${LIBTOOL_COMPILE} ${CXX} -c ${CXXFLAGS} -o ${BUILD_OBJ_DIR}/Product.lo ${SRC_DIR}/Product.cc
+
+
+${BUILD_OBJ_DIR}/RPM.lo: ${SRC_DIR}/RPM.cc
+	${LIBTOOL_COMPILE} ${CXX} -c ${CXXFLAGS} -o ${BUILD_OBJ_DIR}/RPM.lo ${SRC_DIR}/RPM.cc
+
+
+${BUILD_OBJ_DIR}/RPMSourceDescription.lo: ${SRC_DIR}/RPMSourceDescription.cc
+	${LIBTOOL_COMPILE} ${CXX} -c ${CXXFLAGS} -o ${BUILD_OBJ_DIR}/RPMSourceDescription.lo ${SRC_DIR}/RPMSourceDescription.cc
+
+
+${BUILD_OBJ_DIR}/RPMSource.lo: ${SRC_DIR}/RPMSource.cc
+	${LIBTOOL_COMPILE} ${CXX} -c ${CXXFLAGS} -o ${BUILD_OBJ_DIR}/RPMSource.lo ${SRC_DIR}/RPMSource.cc
+
+
+${BUILD_OBJ_DIR}/SoftlinkAction.lo: ${SRC_DIR}/SoftlinkAction.cc
+	${LIBTOOL_COMPILE} ${CXX} -c ${CXXFLAGS} -o ${BUILD_OBJ_DIR}/SoftlinkAction.lo ${SRC_DIR}/SoftlinkAction.cc
+
+
+${BUILD_OBJ_DIR}/AttributeMap.lo: ${SRC_DIR}/AttributeMap.cc
+	${LIBTOOL_COMPILE} ${CXX} -c ${CXXFLAGS} -o ${BUILD_OBJ_DIR}/AttributeMap.lo ${SRC_DIR}/AttributeMap.cc
+
+${BUILD_OBJ_DIR}/GzipInputStream.lo: ${SRC_DIR}/GzipInputStream.cc
+	${LIBTOOL_COMPILE} ${CXX} -c ${CXXFLAGS} -o ${BUILD_OBJ_DIR}/GzipInputStream.lo ${SRC_DIR}/GzipInputStream.cc
+
+${BUILD_OBJ_DIR}/RepoMDParser.lo: ${SRC_DIR}/RepoMDParser.cc
+	${LIBTOOL_COMPILE} ${CXX} -c ${CXXFLAGS} -o ${BUILD_OBJ_DIR}/RepoMDParser.lo ${SRC_DIR}/RepoMDParser.cc
+
+${BUILD_OBJ_DIR}/RepodataRPMSource.lo: ${SRC_DIR}/RepodataRPMSource.cc
+	${LIBTOOL_COMPILE} ${CXX} -c ${CXXFLAGS} -o ${BUILD_OBJ_DIR}/RepodataRPMSource.lo ${SRC_DIR}/RepodataRPMSource.cc
+
+${BUILD_OBJ_DIR}/RPMInfoHandler.lo: ${SRC_DIR}/RPMInfoHandler.cc
+	${LIBTOOL_COMPILE} ${CXX} -c ${CXXFLAGS} -o ${BUILD_OBJ_DIR}/RPMInfoHandler.lo ${SRC_DIR}/RPMInfoHandler.cc
+
+${BUILD_OBJ_DIR}/TagStack.lo: ${SRC_DIR}/TagStack.cc
+	${LIBTOOL_COMPILE} ${CXX} -c ${CXXFLAGS} -o ${BUILD_OBJ_DIR}/TagStack.lo ${SRC_DIR}/TagStack.cc
+
+${BUILD_OBJ_DIR}/main.lo: ${SRC_DIR}/main.cc ${INCLUDE_DIR_BASE}/main.h
+	${LIBTOOL_COMPILE} ${CXX} -c ${CXXFLAGS} -o ${BUILD_OBJ_DIR}/main.lo ${SRC_DIR}/main.cc
+
+install:
+	mkdir -p ${INSTALL_BIN_DIR}
+	mkdir -p ${INSTALL_DOC_DIR}
+	mkdir -p ${INSTALL_MAN_DIR}
+	mkdir -p ${INSTALL_MAN1_DIR}
+
+	${LIBTOOL_INSTALL} ${INSTALL_COMMAND_EXECUTABLE} build/bin/novi ${INSTALL_BIN_DIR}/novi
+	${INSTALL_COMMAND_DATAFILE} doc/novi.1 ${INSTALL_MAN1_DIR}
+	${INSTALL_COMMAND_DATAFILE} doc/novi_examples.1 ${INSTALL_MAN1_DIR}
+	@## pregenerated files for people who lack pod2man and pod2html
+	@## pod2html --title="system tools" doc/novi.1.pod > doc/novi.1.html
+	@## pod2man -c"system tools" doc/novi.1.pod > doc/novi.1
+	@## pod2html --title="system tools" doc/novi_examples.1.pod > doc/novi_examples.1.html
+	@## pod2man -c"system tools" doc/novi_examples.1.pod > doc/novi_examples.1
+
+
+
+clean:
+	-rm -rf ${BUILD_BASE}
+
+distclean: clean
+	-rm -rf ${top_srcdir}/autom4te.cache
+	-rm -rf ${top_srcdir}/config.log
+	-rm -rf ${top_srcdir}/config.status
+	-rm -rf ${top_srcdir}/Makefile
+	-rm -rf ${top_srcdir}/novi.spec-autogen
+	-rm -rf ${INCLUDE_DIR_GENERATED}/NoviInfo.h
+

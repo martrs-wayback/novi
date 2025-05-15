@@ -1,0 +1,147 @@
+=head1 NAME
+
+novi - scan directories for the latest-version RPMs
+
+=head1 SYNOPSIS
+
+B<novi> [ B<-a|action={type}> ]
+   [ B<-t|--target={dir}> ]
+   [ B<-v|--verbose> ]
+   [ B<-h|--help> ]
+   source1 [source2 source3 ...]
+
+Pass a list of RPM source directories as the last arguments.
+For example:
+
+	novi -a hardlink -t /some/dir source1 source2 source3 ...
+
+=head1 DESCRIPTION
+
+There may exist several versions of an RPM for a single product.  B<novi>
+scans directories for RPMs and finds the latest-version RPM for every
+product.
+
+In turn, this data can be used to:
+
+=over 4
+
+=item -
+
+see what are the latest RPMs on your system
+
+=item -
+
+fold the latest RPMs into a Kickstart tree, such that you can
+build systems with the updates already applied
+
+=back
+
+This process is part of Kickstart/Anaconda/Yum repository maintenance,
+described in the following article:
+
+B<"Pre-Patched Kickstart Installs">
+
+http://www.linuxdevcenter.com/pub/a/linux/2005/02/17/kickstart_updates.html
+
+
+=head1 FLAGS
+
+=over 4
+
+=item B<-a, --action={type}>
+
+Specify what to do with the results:
+
+B<list (default)> - show a list of the latest-version RPMs found in the
+specified directories.
+
+
+B<hardlink> - hard-link the latest-version RPMs to the specfied directory.
+This saves space and requires less I/O than copying the files (since
+hard-linking involves an extra pointer in the inode table) but requires all
+source and target directories to exist on the same filesystem.
+
+
+B<softlink> (symbolic link) - this is similar to hard-linking, except that
+the source and destination directories may exist on different filesystems.
+If you serve your Yum/Kickstart area via webserver, make sure the webserver
+is configured to follow symbolic links.
+
+B<copy> - copies the latest-version RPMs to the target directory.  This is
+extremely I/O-intensive (an OS release may contain a couple gigabytes of
+RPMs) but makes the source and target directories completely independent of
+one another.
+
+B<NOTE: "copy" functionality hasn't yet been implemented.>
+
+(All but "list" require a target directory, described below.)
+
+
+=item B<-t, --target={dir}>
+
+Where to put the latest-version RPMs.
+(Used when the action is B<hardlink> or B<softlink>.)
+
+
+=item B<-v, --verbose>
+
+enable verbose output
+
+
+=item B<-h, --help>
+
+show a brief help message
+
+=item B<source1 [source2 source3 ...]>
+
+Specify source paths for RPMs.  Sources can be plain directories (in which
+case novi will look for B<source/*.rpm>) or paths to repo metadata files
+(novi will try to load B<source/repodata/primary.xml.gz>).
+
+Use the B<repo:> prefix to specify a repo metadata source:
+
+	novi ... repo:/some/path
+
+Plain directories require no prefix:
+
+	novi ... /some/path
+
+=back
+
+
+=head1 EXAMPLES
+
+Please refer to the separate L<novi_examples(1)> man page for examples.
+
+
+=head1 AUTHOR
+
+Ethan McCallum
+
+
+=head1 WEBSITE
+
+B<http://www.ExMachinaTech.net/>
+(still under construction)
+
+
+=head1 LIMITATIONS
+
+novi calls the B<librpm> library behind the scenes to extract RPM metadata
+and sort packages per RPM naming conventions.  A package that doesn't
+follow RPM naming conventions or a bug in librpm's version comparison may
+skew novi's results.
+
+
+=head1 SEE ALSO
+
+L<novi_examples(1)>
+
+
+=head1 BUGS
+
+None yet...
+
+
+=head1 NOTES
+
